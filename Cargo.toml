@@ -3,4 +3,6 @@ name = "giraffe"
 version = "0.1.0"
 authors = ["Chris Wilhelm <chris.wilhelm@gmail.com>"]
 
+include = ["src/**/*.rs"]
+
 [dependencies]
