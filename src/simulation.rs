@@ -34,11 +34,21 @@ pub fn evolve_world(world: World) -> World {
         calculate_fitness(&world, &giraffe)
     }).collect();
 
-    let cumulative_densities = generate_cumulative_densities(fitnesses);
+    let (cumulative_densities, total_density) =
+        generate_cumulative_densities(fitnesses);
 
     let giraffes: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
-        let giraffe1 = select_giraffe(&cumulative_densities, &world.giraffes);
-        let giraffe2 = select_giraffe(&cumulative_densities, &world.giraffes);
+        let giraffe1 = select_giraffe(
+            &cumulative_densities,
+            total_density,
+            &world.giraffes
+        );
+
+        let giraffe2 = select_giraffe(
+            &cumulative_densities,
+            total_density,
+            &world.giraffes
+        );
 
         mate_giraffes(&world, giraffe1, giraffe2)
     }).collect();
@@ -50,16 +60,16 @@ pub fn evolve_world(world: World) -> World {
     }
 }
 
-fn generate_cumulative_densities(fitnesses: Vec<f32>) -> Vec<f32>{
+fn generate_cumulative_densities(fitnesses: Vec<f32>) -> (Vec<f32>, f32) {
     let mut total = 0.0;
     let mut cds   = vec![];
 
     for fitness in fitnesses.iter() {
-        total = total + fitness;
         cds.push(total);
+        total = total + fitness;
     }
 
-    cds
+    (cds, total)
 }
 
 fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
@@ -76,8 +86,37 @@ fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
     (world.tree_height as f32 - total_height as f32).abs()
 }
 
-fn select_giraffe<'a>(cumulative_densities: &Vec<f32>, giraffes: &'a Vec<Giraffe>) -> &'a Giraffe {
-    &giraffes[0]
+fn select_giraffe<'a>(cumulative_densities: &Vec<f32>, total_density: f32, giraffes: &'a Vec<Giraffe>) -> &'a Giraffe {
+    let mut range_start = 0;
+    let mut range_end   = cumulative_densities.len();
+    let mut done        = false;
+
+    let search_value = random_proportion() * (total_density - 1.0);
+
+    let mut current: usize = 0;
+
+    while !done {
+        current = (range_start + range_end) / 2;
+        if search_value >= cumulative_densities[current] {
+            let upper_bound;
+
+            if cumulative_densities.len() == current + 1 {
+                upper_bound = total_density;
+            } else {
+                upper_bound = cumulative_densities[current + 1]
+            }
+
+            if search_value < upper_bound {
+                done = true;
+            } else {
+                range_start = current;
+            }
+        } else {
+            range_end = current;
+        }
+    }
+
+    &giraffes[current]
 }
 
 fn mate_giraffes(world: &World, giraffe1: &Giraffe, giraffe2: &Giraffe) -> Giraffe {
@@ -94,7 +133,7 @@ fn mate_giraffes(world: &World, giraffe1: &Giraffe, giraffe2: &Giraffe) -> Giraf
 
 fn apply_mutations(world: &World, characteristics: &Vec<u8>) -> Vec<u8> {
     characteristics.iter().map(|i| {
-        if (rand::random::<u8>() / (!0 as u8)) * 100 > world.mutation_percent {
+        if random_proportion() * 100.0 > world.mutation_percent as f32 {
             *i
         } else {
             rand::random::<u8>()
@@ -108,4 +147,8 @@ fn blend_characteristics(a: &Vec<u8>, b: &Vec<u8>) -> Vec<u8> {
 
         (total / 2) as u8
     }).collect()
+}
+
+fn random_proportion() -> f32 {
+    (rand::random::<u8>() as f32) / ((!0 as u8) as f32)
 }
