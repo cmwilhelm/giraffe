@@ -7,7 +7,7 @@ use world::World;
 
 const WORLD_SIZE:       u16 = 1000;
 const TREE_HEIGHT:      u32 = 1500;
-const MUTATION_PERCENT: u8  = 1;
+const MUTATION_PERCENT: f32 = 0.001;
 
 pub fn build_initial_world() -> World {
     let giraffes: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
@@ -54,10 +54,16 @@ pub fn evolve_world(world: World) -> World {
         mate_giraffes(&world, giraffe1, giraffe2)
     }).collect();
 
+    let tree_height = if random_proportion() < 0.0001 {
+        (random_proportion() * 1500.0 + 500.0) as u32
+    } else {
+        world.tree_height
+    };
+
     World {
         giraffes:         giraffes,
         mutation_percent: world.mutation_percent,
-        tree_height:      world.tree_height
+        tree_height:      tree_height
     }
 }
 
@@ -84,7 +90,7 @@ fn calculate_fitnesses(world: &World, giraffes: &Vec<Giraffe>) -> Vec<f32> {
     };
 
     height_deltas.iter().map(|delta| {
-        (max_delta - *delta).pow(1) as f32
+        ((max_delta - *delta) as f32).cbrt().sqrt()
     }).collect::<Vec<f32>>()
 }
 
