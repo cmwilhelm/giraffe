@@ -113,7 +113,7 @@ fn select_giraffe<'a>(cumulative_densities: &Vec<f64>, total_density: f64, giraf
     let mut range_end   = cumulative_densities.len();
     let mut done        = false;
 
-    let search_value = (random_proportion() as f64) * (total_density - 1.0);
+    let search_value = (random_proportion() as f64) * (total_density);
 
     let mut current: usize = 0;
 
@@ -123,7 +123,7 @@ fn select_giraffe<'a>(cumulative_densities: &Vec<f64>, total_density: f64, giraf
             let upper_bound;
 
             if cumulative_densities.len() == current + 1 {
-                upper_bound = total_density;
+                upper_bound = total_density + 1.0;
             } else {
                 upper_bound = cumulative_densities[current + 1]
             }
@@ -135,6 +135,10 @@ fn select_giraffe<'a>(cumulative_densities: &Vec<f64>, total_density: f64, giraf
             }
         } else {
             range_end = current;
+        }
+
+        if range_end == range_start {
+            done = true;
         }
     }
 
