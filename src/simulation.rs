@@ -5,9 +5,9 @@ use giraffe::Giraffe;
 use world::World;
 
 
-const WORLD_SIZE:       u16 = 10;
-const TREE_HEIGHT:      u32 = !0 / 4;
-const MUTATION_PERCENT: u8  = 10;
+const WORLD_SIZE:       u16 = 1000;
+const TREE_HEIGHT:      u32 = 1500;
+const MUTATION_PERCENT: u8  = 1;
 
 pub fn build_initial_world() -> World {
     let giraffes: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
@@ -61,13 +61,13 @@ pub fn evolve_world(world: World) -> World {
     }
 }
 
-fn generate_cumulative_densities(fitnesses: Vec<f32>) -> (Vec<f32>, f32) {
-    let mut total = 0.0;
-    let mut cds   = vec![];
+fn generate_cumulative_densities(fitnesses: Vec<f32>) -> (Vec<f64>, f64) {
+    let mut total: f64 = 0.0;
+    let mut cds        = vec![];
 
     for fitness in fitnesses.iter() {
         cds.push(total);
-        total = total + fitness;
+        total = total + (*fitness as f64);
     }
 
     (cds, total)
@@ -84,7 +84,7 @@ fn calculate_fitnesses(world: &World, giraffes: &Vec<Giraffe>) -> Vec<f32> {
     };
 
     height_deltas.iter().map(|delta| {
-        (max_delta - *delta) as f32
+        (max_delta - *delta).pow(1) as f32
     }).collect::<Vec<f32>>()
 }
 
@@ -95,19 +95,19 @@ fn calculate_tree_delta(world: &World, giraffe: &Giraffe) -> i32 {
         total_height = total_height + (*l1 as i32);
     }
 
-    for l2 in giraffe.legs.iter() {
+    for l2 in giraffe.neck.iter() {
         total_height = total_height + (*l2 as i32);
     }
 
     (world.tree_height as i32 - total_height as i32).abs()
 }
 
-fn select_giraffe<'a>(cumulative_densities: &Vec<f32>, total_density: f32, giraffes: &'a Vec<Giraffe>) -> &'a Giraffe {
+fn select_giraffe<'a>(cumulative_densities: &Vec<f64>, total_density: f64, giraffes: &'a Vec<Giraffe>) -> &'a Giraffe {
     let mut range_start = 0;
     let mut range_end   = cumulative_densities.len();
     let mut done        = false;
 
-    let search_value = random_proportion() * (total_density - 1.0);
+    let search_value = (random_proportion() as f64) * (total_density - 1.0);
 
     let mut current: usize = 0;
 
@@ -159,10 +159,12 @@ fn apply_mutations(world: &World, characteristics: &Vec<u8>) -> Vec<u8> {
 
 fn blend_characteristics(a: &Vec<u8>, b: &Vec<u8>) -> Vec<u8> {
     a.iter().zip(b.iter()).map(|(i, j)| {
-        let total: u16 = (*i as u16) + (*j as u16);
-
-        (total / 2) as u8
-    }).collect()
+        if random_proportion() <= 0.5 {
+            *i
+        } else {
+            *j
+        }
+    }).collect::<Vec<u8>>()
 }
 
 fn random_proportion() -> f32 {
