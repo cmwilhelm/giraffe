@@ -50,7 +50,7 @@ pub fn evolve_world(world: World) -> World {
     }
 }
 
-pub fn generate_cumulative_densities(fitnesses: Vec<f32>) -> Vec<f32>{
+fn generate_cumulative_densities(fitnesses: Vec<f32>) -> Vec<f32>{
     let mut total = 0.0;
     let mut cds   = vec![];
 
@@ -62,17 +62,44 @@ pub fn generate_cumulative_densities(fitnesses: Vec<f32>) -> Vec<f32>{
     cds
 }
 
-pub fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
-    1.0
+fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
+    let mut total_height: u32 = 0;
+
+    for l1 in giraffe.legs.iter() {
+        total_height = total_height + (*l1 as u32);
+    }
+
+    for l2 in giraffe.legs.iter() {
+        total_height = total_height + (*l2 as u32);
+    }
+
+    (world.tree_height as f32 - total_height as f32).abs()
 }
 
-pub fn select_giraffe<'a>(cumulative_densities: &Vec<f32>, giraffes: &'a Vec<Giraffe>) -> &'a Giraffe {
+fn select_giraffe<'a>(cumulative_densities: &Vec<f32>, giraffes: &'a Vec<Giraffe>) -> &'a Giraffe {
     &giraffes[0]
 }
 
-pub fn mate_giraffes(giraffe1: &Giraffe, giraffe2: &Giraffe) -> Giraffe {
+fn mate_giraffes(giraffe1: &Giraffe, giraffe2: &Giraffe) -> Giraffe {
+    let legs1 = apply_mutations(&giraffe1.legs);
+    let legs2 = apply_mutations(&giraffe2.legs);
+    let neck1 = apply_mutations(&giraffe1.neck);
+    let neck2 = apply_mutations(&giraffe2.neck);
+
     Giraffe {
-        legs: giraffe1.legs.clone(),
-        neck: giraffe1.neck.clone()
+        legs: blend_characteristics(&legs1, &legs2),
+        neck: blend_characteristics(&neck1, &neck2)
     }
+}
+
+fn apply_mutations(characteristics: &Vec<u8>) -> Vec<u8> {
+    characteristics.clone()
+}
+
+fn blend_characteristics(a: &Vec<u8>, b: &Vec<u8>) -> Vec<u8> {
+    a.iter().zip(b.iter()).map(|(i, j)| {
+        let total: u16 = (*i as u16) + (*j as u16);
+
+        (total / 2) as u8
+    }).collect()
 }
