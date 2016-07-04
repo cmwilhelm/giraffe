@@ -9,8 +9,8 @@ const MUTATION_RATE: f32 = 0.001;
 pub struct World {
     pub tower:       Vec<Giraffe>,
     pub tree_height: u32,
-    mutation_rate:   f32,
-    generation:      u32
+    pub generation:  u32,
+    mutation_rate:   f32
 }
 
 impl World {
