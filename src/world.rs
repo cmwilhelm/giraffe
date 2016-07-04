@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use giraffe::Giraffe;
 use giraffe_lib::random_proportion;
 
@@ -33,19 +35,16 @@ impl World {
             &self.tower
         );
 
-        let (cumulative_densities, total_density) =
-            generate_cumulative_densities(fitnesses);
+        let cumulative_densities = generate_cumulative_densities(fitnesses);
 
         let tower: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
             let giraffe1 = select_giraffe(
                 &cumulative_densities,
-                total_density,
                 &self.tower
             );
 
             let giraffe2 = select_giraffe(
                 &cumulative_densities,
-                total_density,
                 &self.tower
             );
 
@@ -68,53 +67,48 @@ impl World {
 }
 
 
-fn generate_cumulative_densities(fitnesses: Vec<f32>) -> (Vec<f64>, f64) {
+fn generate_cumulative_densities(fitnesses: Vec<f32>) -> Vec<(f64, f64)> {
     let mut total: f64 = 0.0;
     let mut cds        = vec![];
 
-    for fitness in fitnesses.iter() {
-        cds.push(total);
-        total = total + (*fitness as f64);
+
+    for i in 0..fitnesses.len() {
+        let first = total;
+        total = total + (fitnesses[i] as f64);
+
+        let second = if i == fitnesses.len() - 1 {
+            total + 1.0
+        } else {
+            total
+        };
+
+        cds.push( (first, second) );
     }
 
-    (cds, total)
+
+    cds
 }
 
-fn select_giraffe<'a>(cumulative_densities: &Vec<f64>, total_density: f64, tower: &'a Vec<Giraffe>) -> &'a Giraffe {
-    let mut range_start = 0;
-    let mut range_end   = cumulative_densities.len();
-    let mut done        = false;
-
-    let search_value = (random_proportion() as f64) * (total_density);
-
-    let mut current: usize = 0;
-
-    while !done {
-        current = (range_start + range_end) / 2;
-        if search_value >= cumulative_densities[current] {
-            let upper_bound;
-
-            if cumulative_densities.len() == current + 1 {
-                upper_bound = total_density + 1.0;
-            } else {
-                upper_bound = cumulative_densities[current + 1]
-            }
-
-            if search_value < upper_bound {
-                done = true;
-            } else {
-                range_start = current;
-            }
+fn select_giraffe<'a>(cumulative_densities: &Vec<(f64, f64)>, tower: &'a Vec<Giraffe>) -> &'a Giraffe {
+    let search_value  = (random_proportion() as f64) * (cumulative_densities.last().unwrap().1 - 1.0);
+    let search_result = cumulative_densities.binary_search_by(|&(min, max)| {
+        if min > search_value {
+            Ordering::Greater
         } else {
-            range_end = current;
+            if search_value > max {
+                Ordering::Less
+            } else {
+                Ordering::Equal
+            }
         }
+    });
 
-        if range_end == range_start {
-            done = true;
-        }
-    }
+    let matching_index = match search_result {
+        Ok(i) => i,
+        _     => 0
+    };
 
-    &tower[current]
+    &tower[matching_index]
 }
 
 fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
