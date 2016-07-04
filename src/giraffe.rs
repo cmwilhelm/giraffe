@@ -1,6 +1,6 @@
 extern crate rand;
 
-use giraffe_lib::random_proportion;
+use giraffe_lib;
 
 
 const LEG_SEGMENTS:  usize = 4;
@@ -29,8 +29,8 @@ impl Giraffe {
         let mutated2 = giraffe2.mutate(mutation_rate);
 
         Giraffe {
-            legs: blend_characteristics(&mutated1.legs, &mutated2.legs),
-            neck: blend_characteristics(&mutated1.neck, &mutated2.legs)
+            legs: giraffe_lib::blend_chromosomes(&mutated1.legs, &mutated2.legs),
+            neck: giraffe_lib::blend_chromosomes(&mutated1.neck, &mutated2.legs)
         }
     }
 
@@ -49,33 +49,17 @@ impl Giraffe {
     }
 
     fn mutate(&self, mutation_rate: f32) -> Self {
-        let mutated_legs_chromosome = apply_mutations(&self.legs, mutation_rate);
-        let mutated_neck_chromosome = apply_mutations(&self.neck, mutation_rate);
+        let mutated_legs_chromosome = giraffe_lib::apply_mutations(
+            &self.legs, mutation_rate
+        );
+
+        let mutated_neck_chromosome = giraffe_lib::apply_mutations(
+            &self.neck, mutation_rate
+        );
 
         Giraffe {
             legs: mutated_legs_chromosome,
             neck: mutated_neck_chromosome
         }
     }
-}
-
-
-fn apply_mutations(characteristics: &Vec<u8>, mutation_rate: f32) -> Vec<u8> {
-    characteristics.iter().map(|i| {
-        if random_proportion() * 100.0 <= mutation_rate as f32 {
-            rand::random::<u8>()
-        } else {
-            *i
-        }
-    }).collect()
-}
-
-fn blend_characteristics(a: &Vec<u8>, b: &Vec<u8>) -> Vec<u8> {
-    a.iter().zip(b.iter()).map(|(i, j)| {
-        if random_proportion() <= 0.5 {
-            *i
-        } else {
-            *j
-        }
-    }).collect::<Vec<u8>>()
 }
