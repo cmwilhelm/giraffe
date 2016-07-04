@@ -3,8 +3,8 @@ extern crate rand;
 use giraffe_lib::random_proportion;
 
 
-pub const LEG_SEGMENTS:  usize = 4;
-pub const NECK_SEGMENTS: usize = 8;
+const LEG_SEGMENTS:  usize = 4;
+const NECK_SEGMENTS: usize = 8;
 
 pub struct Giraffe {
     pub legs: Vec<u8>,
