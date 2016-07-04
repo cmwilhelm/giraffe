@@ -1,6 +1,7 @@
 extern crate gnuplot;
 extern crate statistical;
 
+mod giraffe_lib;
 mod giraffe;
 mod simulation;
 mod world;

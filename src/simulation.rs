@@ -1,7 +1,7 @@
 extern crate rand;
 
-use giraffe;
 use giraffe::Giraffe;
+use giraffe_lib::random_proportion;
 use world::World;
 
 
@@ -11,15 +11,7 @@ const MUTATION_PERCENT: f32 = 0.001;
 
 pub fn build_initial_world() -> World {
     let tower: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
-        let legs: Vec<u8> = (0..giraffe::LEG_SEGMENTS).map(|_| {
-            rand::random::<u8>()
-        }).collect();
-
-        let neck: Vec<u8> = (0..giraffe::NECK_SEGMENTS).map(|_| {
-            rand::random::<u8>()
-        }).collect();
-
-        Giraffe { legs: legs, neck: neck }
+        Giraffe::random()
     }).collect();
 
     World {
@@ -51,7 +43,7 @@ pub fn evolve_world(world: World) -> World {
             &world.tower
         );
 
-        mate_giraffes(&world, giraffe1, giraffe2)
+        Giraffe::mate(giraffe1, giraffe2, world.mutation_percent)
     }).collect();
 
     let tree_height = if random_proportion() < 0.0001 {
@@ -143,41 +135,4 @@ fn select_giraffe<'a>(cumulative_densities: &Vec<f64>, total_density: f64, tower
     }
 
     &tower[current]
-}
-
-fn mate_giraffes(world: &World, giraffe1: &Giraffe, giraffe2: &Giraffe) -> Giraffe {
-    let legs1 = apply_mutations(&world, &giraffe1.legs);
-    let legs2 = apply_mutations(&world, &giraffe2.legs);
-    let neck1 = apply_mutations(&world, &giraffe1.neck);
-    let neck2 = apply_mutations(&world, &giraffe2.neck);
-
-    Giraffe {
-        legs: blend_characteristics(&legs1, &legs2),
-        neck: blend_characteristics(&neck1, &neck2)
-    }
-}
-
-fn apply_mutations(world: &World, characteristics: &Vec<u8>) -> Vec<u8> {
-    characteristics.iter().map(|i| {
-        if random_proportion() * 100.0 <= world.mutation_percent as f32 {
-            rand::random::<u8>()
-        } else {
-            *i
-        }
-    }).collect()
-}
-
-fn blend_characteristics(a: &Vec<u8>, b: &Vec<u8>) -> Vec<u8> {
-    a.iter().zip(b.iter()).map(|(i, j)| {
-        if random_proportion() <= 0.5 {
-            *i
-        } else {
-            *j
-        }
-    }).collect::<Vec<u8>>()
-}
-
-fn random_proportion() -> f32 {
-    let result = (rand::random::<u8>() as f32) / ((!0 as u8) as f32);
-    result
 }
