@@ -25,8 +25,6 @@ impl Statistics {
 }
 
 fn update_state(world: &world::World, statistics: &mut Statistics) {
-    let mut total: i32 = 0;
-
     let sizes = world.tower.iter().map(|giraffe| {
         let mut total = 0;
 
