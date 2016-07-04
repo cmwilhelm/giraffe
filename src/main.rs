@@ -3,7 +3,6 @@ extern crate statistical;
 
 mod giraffe_lib;
 mod giraffe;
-mod simulation;
 mod world;
 
 
@@ -53,11 +52,11 @@ fn update_state(world: &world::World, statistics: &mut Statistics) {
 fn main () {
     let mut statistics = Statistics::new();
 
-    let mut world = simulation::build_initial_world();
+    let mut world = world::World::new();
 
     for _ in 0..SIMULATION_LENGTH {
         update_state(&world, &mut statistics);
-        world = simulation::evolve_world(world);
+        world = world.evolve();
     }
 
     let x: Vec<f64> = (0..SIMULATION_LENGTH).into_iter().map(|i| i as f64).collect();
