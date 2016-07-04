@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 
 use giraffe::Giraffe;
 use giraffe_lib::random_proportion;
+use traits::CanMate;
 
 
 const WORLD_SIZE:    u16 = 1000;

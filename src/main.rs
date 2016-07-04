@@ -1,6 +1,7 @@
 mod giraffe_lib;
 mod giraffe;
 mod statistics;
+mod traits;
 mod world;
 
 
