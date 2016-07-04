@@ -15,7 +15,7 @@ struct Statistics {
 }
 
 impl Statistics {
-    fn new() -> Statistics {
+    fn new() -> Self {
         Statistics {
             means:          vec![],
             std_deviations: vec![],
@@ -27,7 +27,7 @@ impl Statistics {
 fn update_state(world: &world::World, statistics: &mut Statistics) {
     let mut total: i32 = 0;
 
-    let sizes = world.giraffes.iter().map(|giraffe| {
+    let sizes = world.tower.iter().map(|giraffe| {
         let mut total = 0;
 
         for leg in giraffe.legs.iter() {

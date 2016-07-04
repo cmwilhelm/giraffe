@@ -10,7 +10,7 @@ const TREE_HEIGHT:      u32 = 1500;
 const MUTATION_PERCENT: f32 = 0.001;
 
 pub fn build_initial_world() -> World {
-    let giraffes: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
+    let tower: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
         let legs: Vec<u8> = (0..giraffe::LEG_SEGMENTS).map(|_| {
             rand::random::<u8>()
         }).collect();
@@ -23,7 +23,7 @@ pub fn build_initial_world() -> World {
     }).collect();
 
     World {
-        giraffes:         giraffes,
+        tower:            tower,
         mutation_percent: MUTATION_PERCENT,
         tree_height:      TREE_HEIGHT
     }
@@ -32,23 +32,23 @@ pub fn build_initial_world() -> World {
 pub fn evolve_world(world: World) -> World {
     let fitnesses: Vec<f32> = calculate_fitnesses(
         &world,
-        &world.giraffes
+        &world.tower
     );
 
     let (cumulative_densities, total_density) =
         generate_cumulative_densities(fitnesses);
 
-    let giraffes: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
+    let tower: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
         let giraffe1 = select_giraffe(
             &cumulative_densities,
             total_density,
-            &world.giraffes
+            &world.tower
         );
 
         let giraffe2 = select_giraffe(
             &cumulative_densities,
             total_density,
-            &world.giraffes
+            &world.tower
         );
 
         mate_giraffes(&world, giraffe1, giraffe2)
@@ -61,7 +61,7 @@ pub fn evolve_world(world: World) -> World {
     };
 
     World {
-        giraffes:         giraffes,
+        tower:            tower,
         mutation_percent: world.mutation_percent,
         tree_height:      tree_height
     }
@@ -79,8 +79,8 @@ fn generate_cumulative_densities(fitnesses: Vec<f32>) -> (Vec<f64>, f64) {
     (cds, total)
 }
 
-fn calculate_fitnesses(world: &World, giraffes: &Vec<Giraffe>) -> Vec<f32> {
-    let height_deltas: Vec<i32> = giraffes.iter().map(|giraffe| {
+fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
+    let height_deltas: Vec<i32> = tower.iter().map(|giraffe| {
         calculate_tree_delta(&world, &giraffe)
     }).collect();
 
@@ -108,7 +108,7 @@ fn calculate_tree_delta(world: &World, giraffe: &Giraffe) -> i32 {
     (world.tree_height as i32 - total_height as i32).abs()
 }
 
-fn select_giraffe<'a>(cumulative_densities: &Vec<f64>, total_density: f64, giraffes: &'a Vec<Giraffe>) -> &'a Giraffe {
+fn select_giraffe<'a>(cumulative_densities: &Vec<f64>, total_density: f64, tower: &'a Vec<Giraffe>) -> &'a Giraffe {
     let mut range_start = 0;
     let mut range_end   = cumulative_densities.len();
     let mut done        = false;
@@ -142,7 +142,7 @@ fn select_giraffe<'a>(cumulative_densities: &Vec<f64>, total_density: f64, giraf
         }
     }
 
-    &giraffes[current]
+    &tower[current]
 }
 
 fn mate_giraffes(world: &World, giraffe1: &Giraffe, giraffe2: &Giraffe) -> Giraffe {
