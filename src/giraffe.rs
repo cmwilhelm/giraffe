@@ -7,8 +7,8 @@ const LEG_SEGMENTS:  usize = 4;
 const NECK_SEGMENTS: usize = 8;
 
 pub struct Giraffe {
-    pub legs: Vec<u8>,
-    pub neck: Vec<u8>
+    legs: Vec<u8>,
+    neck: Vec<u8>
 }
 
 impl Giraffe {
@@ -32,6 +32,20 @@ impl Giraffe {
             legs: blend_characteristics(&mutated1.legs, &mutated2.legs),
             neck: blend_characteristics(&mutated1.neck, &mutated2.legs)
         }
+    }
+
+    pub fn height(&self) -> i32 {
+        let mut total_height: i32 = 0;
+
+        for l1 in self.legs.iter() {
+            total_height = total_height + (*l1 as i32);
+        }
+
+        for l2 in self.neck.iter() {
+            total_height = total_height + (*l2 as i32);
+        }
+
+        total_height
     }
 
     fn mutate(&self, mutation_rate: f32) -> Self {

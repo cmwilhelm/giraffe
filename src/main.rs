@@ -24,19 +24,9 @@ impl Statistics {
     }
 }
 
-fn update_state(world: &world::World, statistics: &mut Statistics) {
+fn update_statistics(world: &world::World, statistics: &mut Statistics) {
     let sizes = world.tower.iter().map(|giraffe| {
-        let mut total = 0;
-
-        for leg in giraffe.legs.iter() {
-            total = total + (*leg as i64);
-        }
-
-        for neck_segment in giraffe.neck.iter() {
-            total = total + (*neck_segment as i64);
-        }
-
-        total as f64
+        giraffe.height() as f64
     }).collect::<Vec<f64>>();
 
     let mean   = statistical::mean(&sizes);
@@ -55,7 +45,7 @@ fn main () {
     let mut world = world::World::new();
 
     for _ in 0..SIMULATION_LENGTH {
-        update_state(&world, &mut statistics);
+        update_statistics(&world, &mut statistics);
         world = world.evolve();
     }
 

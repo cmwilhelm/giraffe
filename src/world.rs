@@ -133,15 +133,5 @@ fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
 }
 
 fn calculate_tree_delta(world: &World, giraffe: &Giraffe) -> i32 {
-    let mut total_height: i32 = 0;
-
-    for l1 in giraffe.legs.iter() {
-        total_height = total_height + (*l1 as i32);
-    }
-
-    for l2 in giraffe.neck.iter() {
-        total_height = total_height + (*l2 as i32);
-    }
-
-    (world.tree_height as i32 - total_height as i32).abs()
+    (world.tree_height as i32 - giraffe.height()).abs()
 }
