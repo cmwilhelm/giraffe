@@ -3,6 +3,7 @@ extern crate rand;
 use giraffe_lib;
 use traits::CanMate;
 use traits::CanMutate;
+use traits::HasHeight;
 
 
 const LEG_SEGMENTS:  usize = 4;
@@ -24,20 +25,6 @@ impl Giraffe {
         }).collect();
 
         Giraffe { legs: legs_chromosome, neck: neck_chromosome }
-    }
-
-    pub fn height(&self) -> i32 {
-        let mut total_height: i32 = 0;
-
-        for l1 in self.legs.iter() {
-            total_height = total_height + (*l1 as i32);
-        }
-
-        for l2 in self.neck.iter() {
-            total_height = total_height + (*l2 as i32);
-        }
-
-        total_height
     }
 }
 
@@ -67,5 +54,21 @@ impl CanMate for Giraffe {
             legs: giraffe_lib::blend_chromosomes(&mutated1.legs, &mutated2.legs),
             neck: giraffe_lib::blend_chromosomes(&mutated1.neck, &mutated2.legs)
         }
+    }
+}
+
+impl HasHeight for Giraffe {
+    fn height(&self) -> u32 {
+        let mut total_height: u32 = 0;
+
+        for l1 in self.legs.iter() {
+            total_height = total_height + (*l1 as u32);
+        }
+
+        for l2 in self.neck.iter() {
+            total_height = total_height + (*l2 as u32);
+        }
+
+        total_height
     }
 }

@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 use giraffe::Giraffe;
 use giraffe_lib::random_proportion;
 use traits::CanMate;
+use traits::HasHeight;
 
 
 const WORLD_SIZE:    u16 = 1000;
@@ -128,5 +129,5 @@ fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
 }
 
 fn calculate_tree_delta(world: &World, giraffe: &Giraffe) -> i32 {
-    (world.tree_height as i32 - giraffe.height()).abs()
+    (world.tree_height as i32 - giraffe.height() as i32).abs()
 }

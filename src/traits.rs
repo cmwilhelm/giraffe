@@ -5,3 +5,7 @@ pub trait CanMate {
 pub trait CanMutate {
     fn mutate(&self, mutation_rate: f32) -> Self;
 }
+
+pub trait HasHeight {
+    fn height(&self) -> u32;
+}

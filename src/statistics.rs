@@ -1,6 +1,7 @@
 extern crate gnuplot;
 extern crate statistical;
 
+use traits::HasHeight;
 use world;
 
 
