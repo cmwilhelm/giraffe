@@ -9,3 +9,7 @@ pub trait CanMate : CanMutate {
 pub trait HasHeight {
     fn height(&self) -> u32;
 }
+
+pub trait HasSpeed {
+    fn speed(&self) -> u32;
+}

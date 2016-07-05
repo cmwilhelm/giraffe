@@ -4,6 +4,7 @@ use giraffe_lib;
 use traits::CanMate;
 use traits::CanMutate;
 use traits::HasHeight;
+use traits::HasSpeed;
 
 
 const LEG_SEGMENTS:  usize = 4;
@@ -70,5 +71,21 @@ impl HasHeight for Giraffe {
         }
 
         total_height
+    }
+}
+
+impl HasSpeed for Giraffe {
+    fn speed(&self) -> u32 {
+        let leg_height = self.legs.iter().fold(0, |acc, x| {
+            acc + (*x as u32)
+        });
+
+        let speed = (-1) * ((leg_height as i32) / 20 - 25).pow(2) + 625;
+
+        if speed >= 0 {
+            speed as u32
+        } else {
+            0
+        }
     }
 }
