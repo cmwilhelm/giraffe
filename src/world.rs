@@ -145,7 +145,7 @@ fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
             let h_delta_proportion = (h_delta as f32) / (max_height_delta as f32);
             let s_delta_proportion = (s_delta as f32) / (max_speed_delta as f32);
 
-            let base_fitness = 2.5 * h_delta_proportion + s_delta_proportion;
+            let base_fitness = 1.5 * h_delta_proportion + s_delta_proportion;
 
             (base_fitness * 1000.0).cbrt().sqrt()
         }).collect::<Vec<f32>>()
