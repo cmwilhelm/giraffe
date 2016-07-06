@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 use giraffe::Giraffe;
 use giraffe_lib::random_proportion;
 use traits::CanMate;
+use traits::HasColor;
 use traits::HasHeight;
 use traits::HasSpeed;
 
@@ -11,8 +12,10 @@ const WORLD_SIZE:    u16 = 1000;
 const TREE_HEIGHT:   u32 = 1500;
 const MUTATION_RATE: f32 = 0.001;
 const LION_SPEED:    u32 = 500;
+const COLOR:         u32 = 500;
 
 pub struct World {
+    pub color:       u32,
     pub generation:  u32,
     pub lion_speed:  u32,
     pub tower:       Vec<Giraffe>,
@@ -27,6 +30,7 @@ impl World {
         }).collect();
 
         World {
+            color:         COLOR,
             tower:         tower,
             lion_speed:    LION_SPEED,
             mutation_rate: MUTATION_RATE,
@@ -64,6 +68,7 @@ impl World {
         };
 
         World {
+            color:         self.color,
             tower:         tower,
             lion_speed:    self.lion_speed,
             mutation_rate: self.mutation_rate,
@@ -119,6 +124,15 @@ fn select_giraffe<'a>(cumulative_densities: &Vec<(f64, f64)>, tower: &'a Vec<Gir
 }
 
 fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
+    let color_deltas: Vec<i32> = tower.iter().map(|giraffe| {
+        calculate_color_delta(&world, &giraffe)
+    }).collect();
+
+    let max_color_delta = match color_deltas.iter().max() {
+        Some(m) => *m,
+        _       => 0
+    };
+
     let height_deltas: Vec<i32> = tower.iter().map(|giraffe| {
         calculate_tree_delta(&world, &giraffe)
     }).collect();
@@ -137,18 +151,28 @@ fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
         _       => 0
     };
 
-    height_deltas.iter().zip(speed_deltas)
-        .map(|(height_delta, speed_delta)| {
-            let h_delta = max_height_delta - *height_delta;
-            let s_delta = max_speed_delta - speed_delta;
+    let mut fitnesses: Vec<f32> = vec![];
 
-            let h_delta_proportion = (h_delta as f32) / (max_height_delta as f32);
-            let s_delta_proportion = (s_delta as f32) / (max_speed_delta as f32);
+    for i in 0..tower.len() {
+        let c_delta = max_color_delta - color_deltas[i];
+        let h_delta = max_height_delta - height_deltas[i];
+        let s_delta = max_speed_delta - speed_deltas[i];
 
-            let base_fitness = 1.5 * h_delta_proportion + s_delta_proportion;
+        let c_delta_proportion = (c_delta as f32) / (max_color_delta as f32);
+        let h_delta_proportion = (h_delta as f32) / (max_height_delta as f32);
+        let s_delta_proportion = (s_delta as f32) / (max_speed_delta as f32);
 
-            (base_fitness * 1000.0).cbrt().sqrt()
-        }).collect::<Vec<f32>>()
+        let base_fitness = 1.5 * h_delta_proportion + s_delta_proportion + c_delta_proportion;
+
+
+        fitnesses.push((base_fitness * 1000.0).cbrt().sqrt());
+    }
+
+    fitnesses
+}
+
+fn calculate_color_delta(world: &World, giraffe: &Giraffe) -> i32 {
+    (world.color as i32 - giraffe.color() as i32).abs()
 }
 
 fn calculate_tree_delta(world: &World, giraffe: &Giraffe) -> i32 {
