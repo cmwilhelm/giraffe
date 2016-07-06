@@ -21,5 +21,6 @@ fn main () {
         statistics.print_latest();
     }
 
-    statistics.generate_figure("output.png");
+    statistics.generate_height_figure("height_output.png");
+    statistics.generate_speed_figure("speed_output.png");
 }

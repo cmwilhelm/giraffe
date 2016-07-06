@@ -86,7 +86,7 @@ impl Statistics {
         }
     }
 
-    pub fn generate_figure(&self, destination_file: &str) {
+    pub fn generate_height_figure(&self, destination_file: &str) {
         let x: Vec<f64> = (0..self.generations).into_iter().map(|i| {
             i as f64
         }).collect();
@@ -104,6 +104,29 @@ impl Statistics {
                 &x,
                 &self.tree_heights,
                 &[gnuplot::Caption("Tree Height"), gnuplot::Color("red")]
+            );
+
+        figure.show();
+    }
+
+    pub fn generate_speed_figure(&self, destination_file: &str) {
+        let x: Vec<f64> = (0..self.generations).into_iter().map(|i| {
+            i as f64
+        }).collect();
+
+        let mut figure = gnuplot::Figure::new();
+
+        figure.set_terminal("png", destination_file);
+        figure.axes2d()
+            .lines(
+                &x,
+                &self.speed_means,
+                &[gnuplot::Caption("Mean Giraffe Speed"), gnuplot::Color("black")]
+            )
+            .lines(
+                &x,
+                &self.lion_speeds,
+                &[gnuplot::Caption("Lion Speed"), gnuplot::Color("red")]
             );
 
         figure.show();

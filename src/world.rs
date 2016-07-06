@@ -10,7 +10,7 @@ use traits::HasSpeed;
 const WORLD_SIZE:    u16 = 1000;
 const TREE_HEIGHT:   u32 = 1500;
 const MUTATION_RATE: f32 = 0.001;
-const LION_SPEED:    u32 = 100;
+const LION_SPEED:    u32 = 500;
 
 pub struct World {
     pub generation:  u32,
@@ -140,16 +140,14 @@ fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
     height_deltas.iter().zip(speed_deltas)
         .map(|(height_delta, speed_delta)| {
             let h_delta = max_height_delta - *height_delta;
+            let s_delta = max_speed_delta - speed_delta;
 
-            let s_delta = match max_speed_delta {
-                s if s >= 0 => s,
-                s           => speed_delta - s
-            };
+            let h_delta_proportion = (h_delta as f32) / (max_height_delta as f32);
+            let s_delta_proportion = (s_delta as f32) / (max_speed_delta as f32);
 
-            (match h_delta + s_delta {
-                d if d >= 0 => d,
-                _           => 0
-            } as f32).cbrt().sqrt()
+            let base_fitness = 2.5 * h_delta_proportion + s_delta_proportion;
+
+            (base_fitness * 1000.0).cbrt().sqrt()
         }).collect::<Vec<f32>>()
 }
 
@@ -158,5 +156,5 @@ fn calculate_tree_delta(world: &World, giraffe: &Giraffe) -> i32 {
 }
 
 fn calculate_speed_delta(world: &World, giraffe: &Giraffe) -> i32 {
-    giraffe.speed() as i32 - world.lion_speed as i32
+    (world.lion_speed as i32 - giraffe.speed() as i32).abs()
 }
