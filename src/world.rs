@@ -29,6 +29,10 @@ impl World {
             Giraffe::random()
         }).collect();
 
+        World::new_from_tower(tower)
+    }
+
+    pub fn new_from_tower(tower: Vec<Giraffe>) -> Self {
         World {
             color:         COLOR,
             tower:         tower,
@@ -90,8 +94,8 @@ fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
         (giraffe.height() as i32, world.tree_height as i32, 1.5 as f32),
         (giraffe.speed()  as i32, world.lion_speed  as i32, 1.0 as f32)
     ]
-        .iter()
-        .map(|&(phenotype, environment, weight)| {
+        .into_iter()
+        .map(|(phenotype, environment, weight)| {
             let delta = (phenotype - environment).abs();
             let score = match delta {
                 d if d <= environment => (environment - d) as f32 / environment as f32,

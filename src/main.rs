@@ -1,3 +1,8 @@
+extern crate nalgebra;
+extern crate kiss3d;
+extern crate gnuplot;
+
+mod solution_space;
 mod giraffe_lib;
 mod giraffe;
 mod statistics;
@@ -6,7 +11,6 @@ mod world;
 
 
 const SIMULATION_LENGTH: u32 = 1500;
-
 
 fn main () {
     let mut statistics = statistics::Statistics::new();

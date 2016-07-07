@@ -34,8 +34,64 @@ impl Giraffe {
 
         Giraffe {
             color: color_chromosome,
-            legs: legs_chromosome,
-            neck: neck_chromosome
+            legs:  legs_chromosome,
+            neck:  neck_chromosome
+        }
+    }
+
+    pub fn new_from_phenotypic_values(mut color: u32, mut legs: u32, mut neck: u32) -> Self {
+        let mut color_chromosome = vec![];
+        let mut legs_chromosome  = vec![];
+        let mut neck_chromosome  = vec![];
+
+        let gene_max = !0 as u8;
+
+        for _ in 0..COLOR_SEGMENTS {
+            let to_push: u8;
+
+            if color >= gene_max as u32 {
+                to_push = gene_max;
+                color -= gene_max as u32;
+            } else {
+                to_push = color as u8;
+                color = 0;
+            }
+
+            color_chromosome.push(to_push);
+        }
+
+        for _ in 0..LEG_SEGMENTS {
+            let to_push: u8;
+
+            if legs >= gene_max as u32 {
+                to_push = gene_max;
+                legs -= gene_max as u32;
+            } else {
+                to_push = legs as u8;
+                legs = 0;
+            }
+
+            legs_chromosome.push(to_push);
+        }
+
+        for _ in 0..NECK_SEGMENTS {
+            let to_push: u8;
+
+            if neck >= gene_max as u32 {
+                to_push = gene_max;
+                neck -= gene_max as u32;
+            } else {
+                to_push = neck as u8;
+                neck = 0;
+            }
+
+            neck_chromosome.push(to_push);
+        }
+
+        Giraffe {
+            color: color_chromosome,
+            legs:  legs_chromosome,
+            neck:  neck_chromosome
         }
     }
 }
