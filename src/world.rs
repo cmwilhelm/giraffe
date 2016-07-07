@@ -107,7 +107,6 @@ fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
         .fold(0.0, |acc, proportion| {
             (acc + proportion) as f32
         })
-        .cbrt()
 }
 
 fn generate_cumulative_densities(fitnesses: Vec<f32>) -> Vec<(f64, f64)> {

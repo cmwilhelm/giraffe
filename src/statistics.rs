@@ -1,5 +1,5 @@
-extern crate gnuplot;
-extern crate statistical;
+use gnuplot;
+use statistical;
 
 use traits::HasColor;
 use traits::HasHeight;
@@ -12,6 +12,8 @@ pub struct Statistics {
     color_std_deviations:  Vec<f64>,
     height_means:          Vec<f64>,
     height_std_deviations: Vec<f64>,
+    leg_means:             Vec<f64>,
+    neck_means:            Vec<f64>,
     speed_means:           Vec<f64>,
     speed_std_deviations:  Vec<f64>,
     world_colors:          Vec<u32>,
@@ -27,6 +29,8 @@ impl Statistics {
             color_std_deviations:  vec![],
             height_means:          vec![],
             height_std_deviations: vec![],
+            leg_means:             vec![],
+            neck_means:            vec![],
             speed_means:           vec![],
             speed_std_deviations:  vec![],
             world_colors:          vec![],
@@ -45,14 +49,24 @@ impl Statistics {
             giraffe.height() as f64
         }).collect::<Vec<f64>>();
 
+        let leg_lengths = world.tower.iter().map(|giraffe| {
+            giraffe.leg_length() as f64
+        }).collect::<Vec<f64>>();
+
+        let neck_lengths = world.tower.iter().map(|giraffe| {
+            giraffe.neck_length() as f64
+        }).collect::<Vec<f64>>();
+
         let speeds = world.tower.iter().map(|giraffe| {
             giraffe.speed() as f64
         }).collect::<Vec<f64>>();
 
-        let color_mean   = statistical::mean(&colors);
-        let color_stddev = statistical::standard_deviation(&colors, None);
+        let color_mean    = statistical::mean(&colors);
+        let color_stddev  = statistical::standard_deviation(&colors, None);
         let height_mean   = statistical::mean(&sizes);
         let height_stddev = statistical::standard_deviation(&sizes, None);
+        let leg_mean      = statistical::mean(&leg_lengths);
+        let neck_mean     = statistical::mean(&neck_lengths);
         let speed_mean    = statistical::mean(&speeds);
         let speed_stddev  = statistical::standard_deviation(&speeds, None);
 
@@ -60,6 +74,8 @@ impl Statistics {
         self.color_std_deviations.push(color_stddev);
         self.height_means.push(height_mean);
         self.height_std_deviations.push(height_stddev);
+        self.leg_means.push(leg_mean);
+        self.neck_means.push(neck_mean);
         self.speed_means.push(speed_mean);
         self.speed_std_deviations.push(speed_stddev);
 
@@ -72,29 +88,13 @@ impl Statistics {
 
     pub fn print_latest(&self) {
         let latest_color_mean    = self.color_means.last();
-        let latest_color_stddev  = self.color_std_deviations.last();
         let latest_height_mean   = self.height_means.last();
-        let latest_height_stddev = self.height_std_deviations.last();
         let latest_speed_mean    = self.speed_means.last();
-        let latest_speed_stddev  = self.speed_std_deviations.last();
         let latest_world_color   = self.world_colors.last();
         let latest_lion_speed    = self.lion_speeds.last();
         let latest_tree_height   = self.tree_heights.last();
 
-        let mut has_stats = [
-            latest_color_mean,
-            latest_color_stddev,
-            latest_height_mean,
-            latest_height_stddev,
-            latest_speed_mean,
-            latest_speed_stddev
-        ].into_iter().all( |stat| !stat.is_none() );
-
-        if latest_tree_height.is_none() || latest_lion_speed.is_none() {
-            has_stats = false;
-        }
-
-        if has_stats {
+        if self.generations != 0 {
             println!(
                 "g-color: {}, color: {}, g-height: {}, t-height, {}, g-speed: {}, l-speed: {}",
                 latest_color_mean.unwrap(),
@@ -145,6 +145,16 @@ impl Statistics {
                 &x,
                 &self.height_means,
                 &[gnuplot::Caption("Mean Giraffe Height"), gnuplot::Color("black")]
+            )
+            .lines(
+                &x,
+                &self.leg_means,
+                &[gnuplot::Caption("Mean Leg Length"), gnuplot::Color("blue")]
+            )
+            .lines(
+                &x,
+                &self.neck_means,
+                &[gnuplot::Caption("Mean Neck Length"), gnuplot::Color("green")]
             )
             .lines(
                 &x,

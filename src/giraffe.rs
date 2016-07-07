@@ -102,7 +102,7 @@ impl Giraffe {
     }
 
     pub fn neck_length(&self) -> u32 {
-        self.legs.iter().fold(0, |acc, &value| {
+        self.neck.iter().fold(0, |acc, &value| {
             acc + value as u32
         })
     }
@@ -138,7 +138,7 @@ impl CanMate for Giraffe {
         Giraffe {
             color: giraffe_lib::blend_chromosomes(&mutated1.color, &mutated2.color),
             legs:  giraffe_lib::blend_chromosomes(&mutated1.legs, &mutated2.legs),
-            neck:  giraffe_lib::blend_chromosomes(&mutated1.neck, &mutated2.legs)
+            neck:  giraffe_lib::blend_chromosomes(&mutated1.neck, &mutated2.neck)
         }
     }
 }
