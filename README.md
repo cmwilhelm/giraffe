@@ -17,7 +17,8 @@ These genes are exposed to selective pressure. Fur color's selection is modeled
 with ability to camoflage, but leg length and neck length are not directly selected
 for. Rather:
 
-1) giraffes must outrun lions, and their running speed is dictated by their leg length
+1) giraffes must outrun lions, and their running speed is dictated by both leg
+   length and bodyweight
 
 2) giraffes must eat, and their ability to forage is based on their total height
 

@@ -159,6 +159,16 @@ impl HasHeight for Giraffe {
 
 impl HasSpeed for Giraffe {
     fn speed(&self) -> u32 {
-        self.leg_length()
+        let leg_length  = self.leg_length() as f32;
+        let neck_length = self.neck_length() as f32;
+
+        let weight = 4.0 * leg_length + neck_length;
+        let speed  = leg_length * 4.0 - 0.0001 * weight * weight;
+
+        if speed <= 0f32 {
+            0u32
+        } else {
+            speed as u32
+        }
     }
 }
