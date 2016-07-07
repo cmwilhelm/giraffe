@@ -78,7 +78,7 @@ impl World {
     }
 }
 
-fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
+pub fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
     tower.iter().map(|giraffe| {
         calculate_fitness(&world, &giraffe)
     }).collect::<Vec<f32>>()
