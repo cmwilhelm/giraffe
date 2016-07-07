@@ -49,20 +49,24 @@ fn run_simulation() {
     statistics.generate_speed_figure("speed_output.png");
 }
 
+fn handle_terrain_command(args: &Args) {
+    if args.cmd_plot {
+        let destination = "fitness_terrain.png";
+        solution_space::render_plot(destination);
+        println!("Generated fitness terrain plot to {:?}", destination);
+    } else {
+        println!("Preparing to render 3d environment...");
+        solution_space::render_3d();
+    }
+}
+
 fn main () {
     let args: Args = docopt::Docopt::new(USAGE)
         .and_then(|d| d.decode())
         .unwrap_or_else(|e| e.exit());
 
     if args.cmd_terrain {
-        if args.cmd_plot {
-            let destination = "fitness_terrain.png";
-            solution_space::render_plot(destination);
-            println!("Generated fitness terrain plot to {:?}", destination);
-        } else {
-            println!("Preparing to render 3d environment...");
-            solution_space::render_3d();
-        }
+        handle_terrain_command(&args);
     } else {
         run_simulation();
     }
