@@ -1,4 +1,5 @@
 use gnuplot;
+use gnuplot::AxesCommon;
 use statistical;
 
 use traits::HasColor;
@@ -118,6 +119,8 @@ impl Statistics {
 
         figure.set_terminal("png", destination_file);
         figure.axes2d()
+            .set_x_label("Generation", &vec![])
+            .set_y_label("Color", &vec![])
             .lines(
                 &x,
                 &self.color_means,
@@ -141,6 +144,8 @@ impl Statistics {
 
         figure.set_terminal("png", destination_file);
         figure.axes2d()
+            .set_x_label("Generation", &vec![])
+            .set_y_label("Height", &vec![])
             .lines(
                 &x,
                 &self.height_means,
@@ -174,6 +179,8 @@ impl Statistics {
 
         figure.set_terminal("png", destination_file);
         figure.axes2d()
+            .set_x_label("Generation", &vec![])
+            .set_y_label("Speed", &vec![])
             .lines(
                 &x,
                 &self.speed_means,
