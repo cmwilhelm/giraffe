@@ -94,6 +94,18 @@ impl Giraffe {
             neck:  neck_chromosome
         }
     }
+
+    pub fn leg_length(&self) -> u32 {
+        self.legs.iter().fold(0, |acc, &value| {
+            acc + value as u32
+        })
+    }
+
+    pub fn neck_length(&self) -> u32 {
+        self.legs.iter().fold(0, |acc, &value| {
+            acc + value as u32
+        })
+    }
 }
 
 impl CanMutate for Giraffe {
@@ -141,26 +153,12 @@ impl HasColor for Giraffe {
 
 impl HasHeight for Giraffe {
     fn height(&self) -> u32 {
-        let mut total_height: u32 = 0;
-
-        for l1 in self.legs.iter() {
-            total_height = total_height + (*l1 as u32);
-        }
-
-        for l2 in self.neck.iter() {
-            total_height = total_height + (*l2 as u32);
-        }
-
-        total_height
+        self.leg_length() + self.neck_length()
     }
 }
 
 impl HasSpeed for Giraffe {
     fn speed(&self) -> u32 {
-        let leg_height = self.legs.iter().fold(0, |acc, &x| {
-            acc + (x as u32)
-        });
-
-        leg_height
+        self.leg_length()
     }
 }
