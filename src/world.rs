@@ -78,11 +78,37 @@ impl World {
     }
 }
 
+fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
+    tower.iter().map(|giraffe| {
+        calculate_fitness(&world, &giraffe)
+    }).collect::<Vec<f32>>()
+}
+
+fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
+    vec![
+        (giraffe.color()  as i32, world.color       as i32, 1.0 as f32),
+        (giraffe.height() as i32, world.tree_height as i32, 1.5 as f32),
+        (giraffe.speed()  as i32, world.lion_speed  as i32, 1.0 as f32)
+    ]
+        .iter()
+        .map(|&(phenotype, environment, weight)| {
+            let delta = (phenotype - environment).abs();
+            let score = match delta {
+                d if d <= environment => (environment - d) as f32 / environment as f32,
+                _ => 0.0
+            };
+
+            score * weight as f32
+        })
+        .fold(0.0, |acc, proportion| {
+            (acc + proportion) as f32
+        })
+        .cbrt()
+}
 
 fn generate_cumulative_densities(fitnesses: Vec<f32>) -> Vec<(f64, f64)> {
     let mut total: f64 = 0.0;
     let mut cds        = vec![];
-
 
     for i in 0..fitnesses.len() {
         let first = total;
@@ -96,7 +122,6 @@ fn generate_cumulative_densities(fitnesses: Vec<f32>) -> Vec<(f64, f64)> {
 
         cds.push( (first, second) );
     }
-
 
     cds
 }
@@ -121,64 +146,4 @@ fn select_giraffe<'a>(cumulative_densities: &Vec<(f64, f64)>, tower: &'a Vec<Gir
     };
 
     &tower[matching_index]
-}
-
-fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
-    let color_deltas: Vec<i32> = tower.iter().map(|giraffe| {
-        calculate_color_delta(&world, &giraffe)
-    }).collect();
-
-    let max_color_delta = match color_deltas.iter().max() {
-        Some(m) => *m,
-        _       => 0
-    };
-
-    let height_deltas: Vec<i32> = tower.iter().map(|giraffe| {
-        calculate_tree_delta(&world, &giraffe)
-    }).collect();
-
-    let max_height_delta = match height_deltas.iter().max() {
-        Some(m) => *m,
-        _       => 0
-    };
-
-    let speed_deltas: Vec<i32> = tower.iter().map(|giraffe| {
-        calculate_speed_delta(&world, &giraffe)
-    }).collect();
-
-    let max_speed_delta = match speed_deltas.iter().max() {
-        Some(m) => *m,
-        _       => 0
-    };
-
-    let mut fitnesses: Vec<f32> = vec![];
-
-    for i in 0..tower.len() {
-        let c_delta = max_color_delta - color_deltas[i];
-        let h_delta = max_height_delta - height_deltas[i];
-        let s_delta = max_speed_delta - speed_deltas[i];
-
-        let c_delta_proportion = (c_delta as f32) / (max_color_delta as f32);
-        let h_delta_proportion = (h_delta as f32) / (max_height_delta as f32);
-        let s_delta_proportion = (s_delta as f32) / (max_speed_delta as f32);
-
-        let base_fitness = 1.5 * h_delta_proportion + s_delta_proportion + c_delta_proportion;
-
-
-        fitnesses.push((base_fitness * 1000.0).cbrt().sqrt());
-    }
-
-    fitnesses
-}
-
-fn calculate_color_delta(world: &World, giraffe: &Giraffe) -> i32 {
-    (world.color as i32 - giraffe.color() as i32).abs()
-}
-
-fn calculate_tree_delta(world: &World, giraffe: &Giraffe) -> i32 {
-    (world.tree_height as i32 - giraffe.height() as i32).abs()
-}
-
-fn calculate_speed_delta(world: &World, giraffe: &Giraffe) -> i32 {
-    (world.lion_speed as i32 - giraffe.speed() as i32).abs()
 }
