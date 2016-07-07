@@ -17,7 +17,7 @@ pub fn apply_mutations(chromosome: &Vec<u8>, mutation_rate: f32) -> Vec<u8> {
 }
 
 pub fn blend_chromosomes(a: &Vec<u8>, b: &Vec<u8>) -> Vec<u8> {
-    a.iter().zip(b.iter()).map(|(a_gene, b_gene)| {
+    a.iter().zip(b).map(|(a_gene, b_gene)| {
         if random_proportion() <= 0.5 {
             *a_gene
         } else {
