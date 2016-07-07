@@ -1,3 +1,5 @@
+extern crate docopt;
+extern crate rustc_serialize;
 extern crate nalgebra;
 extern crate kiss3d;
 extern crate gnuplot;
@@ -9,10 +11,27 @@ mod statistics;
 mod traits;
 mod world;
 
+const USAGE: &'static str = "
+Giraffe!
+
+Usage:
+  giraffe
+  giraffe terrain (plot|3d)
+
+Options:
+  -h --help     Show this screen.
+";
+
+#[derive(Debug, RustcDecodable)]
+struct Args {
+    cmd_terrain: bool,
+    cmd_plot:    bool,
+    cmd_3d:      bool
+}
 
 const SIMULATION_LENGTH: u32 = 1500;
 
-fn main () {
+fn run_simulation() {
     let mut statistics = statistics::Statistics::new();
     let mut world      = world::World::new();
 
@@ -28,4 +47,23 @@ fn main () {
     statistics.generate_color_figure("color_output.png");
     statistics.generate_height_figure("height_output.png");
     statistics.generate_speed_figure("speed_output.png");
+}
+
+fn main () {
+    let args: Args = docopt::Docopt::new(USAGE)
+        .and_then(|d| d.decode())
+        .unwrap_or_else(|e| e.exit());
+
+    if args.cmd_terrain {
+        if args.cmd_plot {
+            let destination = "fitness_terrain.png";
+            solution_space::render_plot(destination);
+            println!("Generated fitness terrain plot to {:?}", destination);
+        } else {
+            println!("Preparing to render 3d environment...");
+            solution_space::render_3d();
+        }
+    } else {
+        run_simulation();
+    }
 }

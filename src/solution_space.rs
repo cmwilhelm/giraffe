@@ -61,8 +61,6 @@ fn create_mesh_points(matrix: &Vec<Vec<f32>>) -> Vec<nalgebra::Point3<f32>> {
     let mut results = vec![];
 
     for i in 0..(NUM_ROWS as usize) {
-        let ref row = matrix[i];
-
         for j in 0..(NUM_COLS as usize) {
             results.push(
                 nalgebra::Point3::new(
@@ -77,12 +75,11 @@ fn create_mesh_points(matrix: &Vec<Vec<f32>>) -> Vec<nalgebra::Point3<f32>> {
     results
 }
 
-fn create_mesh_triangles(matrix: &Vec<Vec<f32>>) -> Vec<nalgebra::Point3<u32>> {
+fn create_mesh_triangles() -> Vec<nalgebra::Point3<u32>> {
     let mut results = vec![];
 
     for i in 0..(NUM_ROWS - 1) {
         let start_value = i * NUM_COLS;
-        let ref row     = matrix[i as usize];
 
         for j in 0..(NUM_COLS - 1) {
             results.push(
@@ -106,13 +103,13 @@ fn create_mesh_triangles(matrix: &Vec<Vec<f32>>) -> Vec<nalgebra::Point3<u32>> {
     results
 }
 
-pub fn render_plot() {
+pub fn render_plot(destination: &str) {
     let world     = create_test_world();
     let fitnesses = world::calculate_fitnesses(&world, &world.tower);
 
     let mut figure = gnuplot::Figure::new();
 
-    figure.set_terminal("png", "fitness_terrain.png");
+    figure.set_terminal("png", destination);
     figure.axes3d()
         .set_x_label("Neck Length", &vec![])
         .set_y_label("Leg Length", &vec![])
@@ -129,7 +126,7 @@ pub fn render_3d() {
 
     let matrix    = create_fitness_matrix();
     let vertices  = create_mesh_points(&matrix);
-    let triangles = create_mesh_triangles(&matrix);
+    let triangles = create_mesh_triangles();
 
     let mesh = Rc::new(
         RefCell::new(
