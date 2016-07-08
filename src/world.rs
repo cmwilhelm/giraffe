@@ -14,7 +14,7 @@ const TREE_HEIGHT:   u32          = 1500;
 const MUTATION_RATE: f32          = 0.001;
 const LION_SPEED:    u32          = 500;
 const COLOR:         u32          = 500;
-const BLENDING_MODE: BlendingMode = BlendingMode::UniformCrossover;
+const BLENDING_MODE: BlendingMode = BlendingMode::OnePointCrossover;
 
 pub struct World {
     pub color:       u32,

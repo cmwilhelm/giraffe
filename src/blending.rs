@@ -24,13 +24,19 @@ fn mean(a: &Vec<u8>, b: &Vec<u8>) -> Vec<u8> {
 fn one_point_crossover(a: &Vec<u8>, b: &Vec<u8>) -> Vec<u8> {
     let crossover_point = (random_proportion() * (a.len() as f32)) as usize;
 
+    let (parent1, parent2) = if random_proportion() <= 0.5 {
+        (a, b)
+    } else {
+        (b, a)
+    };
+
     let mut new_chromosome = vec![];
 
     for i in 0..a.len() {
         let source = if i < crossover_point {
-            a
+            parent1
         } else {
-            b
+            parent2
         };
 
         new_chromosome.push(source[i]);
