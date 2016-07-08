@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use giraffe::Giraffe;
-use giraffe_lib::random_proportion;
+use giraffe_lib::{random_proportion, BlendingMode};
 use traits::CanMate;
 use traits::HasColor;
 use traits::HasHeight;
@@ -62,7 +62,7 @@ impl World {
                 &self.tower
             );
 
-            Giraffe::mate(giraffe1, giraffe2, self.mutation_rate)
+            Giraffe::mate(giraffe1, giraffe2, self.mutation_rate, &BlendingMode::UniformCrossOver)
         }).collect();
 
         let tree_height = if random_proportion() < 0.0001 {

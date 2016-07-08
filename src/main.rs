@@ -3,6 +3,7 @@ extern crate rustc_serialize;
 extern crate nalgebra;
 extern crate kiss3d;
 extern crate gnuplot;
+extern crate rand;
 extern crate statistical;
 
 mod solution_space;
