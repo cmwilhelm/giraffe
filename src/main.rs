@@ -6,10 +6,11 @@ extern crate gnuplot;
 extern crate rand;
 extern crate statistical;
 
-mod solution_space;
 mod blending;
-mod giraffe_lib;
+mod mutation;
 mod giraffe;
+mod giraffe_lib;
+mod solution_space;
 mod statistics;
 mod traits;
 mod world;
