@@ -6,6 +6,7 @@ extern crate gnuplot;
 extern crate rand;
 extern crate statistical;
 
+mod defaults;
 mod blending;
 mod mutation;
 mod giraffe;

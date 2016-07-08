@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 
 use blending::BlendingMode;
+use defaults;
 use giraffe::Giraffe;
 use giraffe_lib::random_proportion;
 use mutation::{MutationDecay, calculate_mutation_rate};
@@ -9,15 +10,6 @@ use traits::HasColor;
 use traits::HasHeight;
 use traits::HasSpeed;
 
-
-const SIMULATION_LENGTH: u32           = 1500;
-const WORLD_SIZE:        u16           = 1000;
-const TREE_HEIGHT:       u32           = 1500;
-const MUTATION_RATE:     f32           = 0.001;
-const LION_SPEED:        u32           = 500;
-const COLOR:             u32           = 500;
-const BLENDING_MODE:     BlendingMode  = BlendingMode::OnePointCrossover;
-const MUTATION_DECAY:    MutationDecay = MutationDecay::None;
 
 pub struct World {
     pub color:             u32,
@@ -33,7 +25,7 @@ pub struct World {
 
 impl World {
     pub fn new(simulation_length: Option<u32>) -> Self {
-        let tower: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
+        let tower: Vec<Giraffe> = (0..defaults::WORLD_SIZE).map(|_| {
             Giraffe::random()
         }).collect();
 
@@ -43,17 +35,17 @@ impl World {
     pub fn new_from_tower(tower: Vec<Giraffe>, simulation_length: Option<u32>) -> Self {
         let length = match simulation_length {
             Some(s) => s,
-            None    => SIMULATION_LENGTH
+            None    => defaults::SIMULATION_LENGTH
         };
 
         World {
-            color:             COLOR,
+            color:             defaults::COLOR,
             tower:             tower,
-            lion_speed:        LION_SPEED,
-            mutation_rate:     MUTATION_RATE,
-            mutation_decay:    MUTATION_DECAY,
-            blending_mode:     BLENDING_MODE,
-            tree_height:       TREE_HEIGHT,
+            lion_speed:        defaults::LION_SPEED,
+            mutation_rate:     defaults::MUTATION_RATE,
+            mutation_decay:    defaults::MUTATION_DECAY,
+            blending_mode:     defaults::BLENDING_MODE,
+            tree_height:       defaults::TREE_HEIGHT,
             generation:        0,
             simulation_length: length
         }
@@ -74,7 +66,7 @@ impl World {
 
         let cumulative_densities = generate_cumulative_densities(fitnesses);
 
-        let tower: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
+        let tower: Vec<Giraffe> = (0..defaults::WORLD_SIZE).map(|_| {
             let giraffe1 = select_giraffe(
                 &cumulative_densities,
                 &self.tower
