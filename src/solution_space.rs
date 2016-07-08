@@ -31,7 +31,7 @@ fn create_test_tower() -> Vec<Giraffe> {
 fn create_test_world() -> world::World {
     let tower = create_test_tower();
 
-    world::World::new_from_tower(tower)
+    world::World::new_from_tower(tower, None)
 }
 
 fn create_fitness_matrix() -> Vec<Vec<f32>> {

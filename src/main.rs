@@ -33,16 +33,14 @@ struct Args {
     cmd_3d:      bool
 }
 
-const SIMULATION_LENGTH: u32 = 1500;
-
 fn run_simulation() {
     let mut statistics = statistics::Statistics::new();
-    let mut world      = world::World::new();
+    let mut world      = world::World::new(None);
 
     statistics.update(&world);
     statistics.print_latest();
 
-    for _ in 0..SIMULATION_LENGTH {
+    for _ in 0..world.simulation_length {
         world = world.evolve();
         statistics.update(&world);
         statistics.print_latest();

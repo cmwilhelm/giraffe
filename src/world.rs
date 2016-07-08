@@ -3,51 +3,70 @@ use std::cmp::Ordering;
 use blending::BlendingMode;
 use giraffe::Giraffe;
 use giraffe_lib::random_proportion;
+use mutation::{MutationDecay, calculate_mutation_rate};
 use traits::CanMate;
 use traits::HasColor;
 use traits::HasHeight;
 use traits::HasSpeed;
 
 
-const WORLD_SIZE:    u16          = 1000;
-const TREE_HEIGHT:   u32          = 1500;
-const MUTATION_RATE: f32          = 0.001;
-const LION_SPEED:    u32          = 500;
-const COLOR:         u32          = 500;
-const BLENDING_MODE: BlendingMode = BlendingMode::OnePointCrossover;
+const SIMULATION_LENGTH: u32           = 1500;
+const WORLD_SIZE:        u16           = 1000;
+const TREE_HEIGHT:       u32           = 1500;
+const MUTATION_RATE:     f32           = 0.001;
+const LION_SPEED:        u32           = 500;
+const COLOR:             u32           = 500;
+const BLENDING_MODE:     BlendingMode  = BlendingMode::OnePointCrossover;
+const MUTATION_DECAY:    MutationDecay = MutationDecay::None;
 
 pub struct World {
-    pub color:       u32,
-    pub generation:  u32,
-    pub lion_speed:  u32,
-    pub tower:       Vec<Giraffe>,
-    pub tree_height: u32,
-    mutation_rate:   f32,
-    blending_mode:   BlendingMode
+    pub color:             u32,
+    pub generation:        u32,
+    pub simulation_length: u32,
+    pub lion_speed:        u32,
+    pub tower:             Vec<Giraffe>,
+    pub tree_height:       u32,
+    mutation_rate:         f32,
+    blending_mode:         BlendingMode,
+    mutation_decay:        MutationDecay
 }
 
 impl World {
-    pub fn new() -> Self {
+    pub fn new(simulation_length: Option<u32>) -> Self {
         let tower: Vec<Giraffe> = (0..WORLD_SIZE).map(|_| {
             Giraffe::random()
         }).collect();
 
-        World::new_from_tower(tower)
+        World::new_from_tower(tower, simulation_length)
     }
 
-    pub fn new_from_tower(tower: Vec<Giraffe>) -> Self {
+    pub fn new_from_tower(tower: Vec<Giraffe>, simulation_length: Option<u32>) -> Self {
+        let length = match simulation_length {
+            Some(s) => s,
+            None    => SIMULATION_LENGTH
+        };
+
         World {
-            color:         COLOR,
-            tower:         tower,
-            lion_speed:    LION_SPEED,
-            mutation_rate: MUTATION_RATE,
-            blending_mode: BLENDING_MODE,
-            tree_height:   TREE_HEIGHT,
-            generation:    0
+            color:             COLOR,
+            tower:             tower,
+            lion_speed:        LION_SPEED,
+            mutation_rate:     MUTATION_RATE,
+            mutation_decay:    MUTATION_DECAY,
+            blending_mode:     BLENDING_MODE,
+            tree_height:       TREE_HEIGHT,
+            generation:        0,
+            simulation_length: length
         }
     }
 
     pub fn evolve(&self) -> Self {
+        let mutation_rate = calculate_mutation_rate(
+            self.mutation_decay,
+            self.mutation_rate,
+            self.generation + 1,
+            self.simulation_length
+        );
+
         let fitnesses: Vec<f32> = calculate_fitnesses(
             &self,
             &self.tower
@@ -66,7 +85,7 @@ impl World {
                 &self.tower
             );
 
-            Giraffe::mate(giraffe1, giraffe2, self.mutation_rate, self.blending_mode)
+            Giraffe::mate(giraffe1, giraffe2, mutation_rate, self.blending_mode)
         }).collect();
 
         let tree_height = if random_proportion() < 0.0001 {
@@ -76,13 +95,15 @@ impl World {
         };
 
         World {
-            color:         self.color,
-            tower:         tower,
-            lion_speed:    self.lion_speed,
-            mutation_rate: self.mutation_rate,
-            blending_mode: self.blending_mode,
-            tree_height:   tree_height,
-            generation:    self.generation + 1
+            color:             self.color,
+            tower:             tower,
+            lion_speed:        self.lion_speed,
+            mutation_rate:     self.mutation_rate,
+            mutation_decay:    self.mutation_decay,
+            blending_mode:     self.blending_mode,
+            tree_height:       tree_height,
+            generation:        self.generation + 1,
+            simulation_length: self.simulation_length
         }
     }
 }
