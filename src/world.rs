@@ -1,18 +1,20 @@
 use std::cmp::Ordering;
 
+use blending::BlendingMode;
 use giraffe::Giraffe;
-use giraffe_lib::{random_proportion, BlendingMode};
+use giraffe_lib::random_proportion;
 use traits::CanMate;
 use traits::HasColor;
 use traits::HasHeight;
 use traits::HasSpeed;
 
 
-const WORLD_SIZE:    u16 = 1000;
-const TREE_HEIGHT:   u32 = 1500;
-const MUTATION_RATE: f32 = 0.001;
-const LION_SPEED:    u32 = 500;
-const COLOR:         u32 = 500;
+const WORLD_SIZE:    u16          = 1000;
+const TREE_HEIGHT:   u32          = 1500;
+const MUTATION_RATE: f32          = 0.001;
+const LION_SPEED:    u32          = 500;
+const COLOR:         u32          = 500;
+const BLENDING_MODE: BlendingMode = BlendingMode::UniformCrossOver;
 
 pub struct World {
     pub color:       u32,
@@ -20,7 +22,8 @@ pub struct World {
     pub lion_speed:  u32,
     pub tower:       Vec<Giraffe>,
     pub tree_height: u32,
-    mutation_rate:   f32
+    mutation_rate:   f32,
+    blending_mode:   BlendingMode
 }
 
 impl World {
@@ -38,6 +41,7 @@ impl World {
             tower:         tower,
             lion_speed:    LION_SPEED,
             mutation_rate: MUTATION_RATE,
+            blending_mode: BLENDING_MODE,
             tree_height:   TREE_HEIGHT,
             generation:    0
         }
@@ -62,7 +66,7 @@ impl World {
                 &self.tower
             );
 
-            Giraffe::mate(giraffe1, giraffe2, self.mutation_rate, &BlendingMode::UniformCrossOver)
+            Giraffe::mate(giraffe1, giraffe2, self.mutation_rate, self.blending_mode)
         }).collect();
 
         let tree_height = if random_proportion() < 0.0001 {
@@ -76,6 +80,7 @@ impl World {
             tower:         tower,
             lion_speed:    self.lion_speed,
             mutation_rate: self.mutation_rate,
+            blending_mode: self.blending_mode,
             tree_height:   tree_height,
             generation:    self.generation + 1
         }

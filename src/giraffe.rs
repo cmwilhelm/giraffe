@@ -1,7 +1,7 @@
 extern crate rand;
 
+use blending::{BlendingMode, blend_chromosomes};
 use giraffe_lib;
-use giraffe_lib::BlendingMode;
 
 use traits::CanMate;
 use traits::CanMutate;
@@ -133,14 +133,14 @@ impl CanMutate for Giraffe {
 }
 
 impl CanMate for Giraffe {
-    fn mate(giraffe1: &Self, giraffe2: &Self, mutation_rate: f32, blending_mode: &BlendingMode) -> Self {
+    fn mate(giraffe1: &Self, giraffe2: &Self, mutation_rate: f32, blending_mode: BlendingMode) -> Self {
         let mutated1 = giraffe1.mutate(mutation_rate);
         let mutated2 = giraffe2.mutate(mutation_rate);
 
         Giraffe {
-            color: giraffe_lib::blend_chromosomes(&mutated1.color, &mutated2.color, &blending_mode),
-            legs:  giraffe_lib::blend_chromosomes(&mutated1.legs, &mutated2.legs, &blending_mode),
-            neck:  giraffe_lib::blend_chromosomes(&mutated1.neck, &mutated2.neck, &blending_mode)
+            color: blend_chromosomes(&mutated1.color, &mutated2.color, blending_mode),
+            legs:  blend_chromosomes(&mutated1.legs, &mutated2.legs, blending_mode),
+            neck:  blend_chromosomes(&mutated1.neck, &mutated2.neck, blending_mode)
         }
     }
 }

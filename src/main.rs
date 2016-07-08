@@ -7,6 +7,7 @@ extern crate rand;
 extern crate statistical;
 
 mod solution_space;
+mod blending;
 mod giraffe_lib;
 mod giraffe;
 mod statistics;

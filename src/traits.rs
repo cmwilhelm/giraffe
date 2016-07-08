@@ -1,4 +1,4 @@
-use giraffe_lib::BlendingMode;
+use blending::BlendingMode;
 
 
 pub trait CanMutate {
@@ -6,7 +6,7 @@ pub trait CanMutate {
 }
 
 pub trait CanMate : CanMutate {
-    fn mate(a: &Self, b: &Self, mutation_rate: f32, blending_mode: &BlendingMode) -> Self;
+    fn mate(a: &Self, b: &Self, mutation_rate: f32, blending_mode: BlendingMode) -> Self;
 }
 
 pub trait HasColor {
