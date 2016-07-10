@@ -92,17 +92,21 @@ fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
     ]
         .into_iter()
         .map(|(phenotype, environment, weight)| {
-            let delta = (phenotype - environment).abs();
-            let score = match delta {
-                d if d <= environment => (environment - d) as f32 / environment as f32,
-                _ => 0.0
-            };
-
-            score * weight as f32
+            calculate_partial_fitness(phenotype, environment, weight)
         })
         .fold(0.0, |acc, proportion| {
             (acc + proportion) as f32
         })
+}
+
+fn calculate_partial_fitness(phenotype: i32, environment: i32, weight: f32) -> f32 {
+    let delta = (phenotype - environment).abs();
+    let score = match delta {
+        d if d <= environment => (environment - d) as f32 / environment as f32,
+        _ => 0.0
+    };
+
+    score * weight as f32
 }
 
 fn generate_cumulative_densities(fitnesses: Vec<f32>) -> Vec<(f64, f64)> {
