@@ -80,9 +80,9 @@ impl Statistics {
         self.speed_means.push(speed_mean);
         self.speed_std_deviations.push(speed_stddev);
 
-        self.world_colors.push(world.color);
-        self.lion_speeds.push(world.lion_speed);
-        self.tree_heights.push(world.tree_height);
+        self.world_colors.push(world.options.color);
+        self.lion_speeds.push(world.options.lion_speed);
+        self.tree_heights.push(world.options.tree_height);
 
         self.generations = world.generation;
     }

@@ -5,6 +5,7 @@ use defaults;
 use giraffe::Giraffe;
 use giraffe_lib::random_proportion;
 use mutation::{MutationDecay, calculate_mutation_rate};
+use options;
 use traits::CanMate;
 use traits::HasColor;
 use traits::HasHeight;
@@ -12,51 +13,34 @@ use traits::HasSpeed;
 
 
 pub struct World {
-    pub color:             u32,
-    pub generation:        u32,
-    pub simulation_length: u32,
-    pub lion_speed:        u32,
-    pub tower:             Vec<Giraffe>,
-    pub tree_height:       u32,
-    mutation_rate:         f32,
-    blending_mode:         BlendingMode,
-    mutation_decay:        MutationDecay
+    pub generation: u32,
+    pub options:    options::Options,
+    pub tower:      Vec<Giraffe>
 }
 
 impl World {
-    pub fn new(simulation_length: Option<u32>) -> Self {
+    pub fn new(options: options::Options) -> Self {
         let tower: Vec<Giraffe> = (0..defaults::WORLD_SIZE).map(|_| {
             Giraffe::random()
         }).collect();
 
-        World::new_from_tower(tower, simulation_length)
+        World::new_from_tower(tower, options)
     }
 
-    pub fn new_from_tower(tower: Vec<Giraffe>, simulation_length: Option<u32>) -> Self {
-        let length = match simulation_length {
-            Some(s) => s,
-            None    => defaults::SIMULATION_LENGTH
-        };
-
+    pub fn new_from_tower(tower: Vec<Giraffe>, options: options::Options) -> Self {
         World {
-            color:             defaults::COLOR,
-            tower:             tower,
-            lion_speed:        defaults::LION_SPEED,
-            mutation_rate:     defaults::MUTATION_RATE,
-            mutation_decay:    defaults::MUTATION_DECAY,
-            blending_mode:     defaults::BLENDING_MODE,
-            tree_height:       defaults::TREE_HEIGHT,
-            generation:        0,
-            simulation_length: length
+            generation: 0,
+            options:    options,
+            tower:      tower
         }
     }
 
     pub fn evolve(&self) -> Self {
         let mutation_rate = calculate_mutation_rate(
-            self.mutation_decay,
-            self.mutation_rate,
+            self.options.mutation_decay,
+            self.options.mutation_rate,
             self.generation + 1,
-            self.simulation_length
+            self.options.simulation_length
         );
 
         let fitnesses: Vec<f32> = calculate_fitnesses(
@@ -77,25 +61,29 @@ impl World {
                 &self.tower
             );
 
-            Giraffe::mate(giraffe1, giraffe2, mutation_rate, self.blending_mode)
+            Giraffe::mate(giraffe1, giraffe2, mutation_rate, self.options.blending_mode)
         }).collect();
 
         let tree_height = if random_proportion() < 0.0001 {
             (random_proportion() * 1500.0 + 500.0) as u32
         } else {
-            self.tree_height
+            self.options.tree_height
+        };
+
+        let new_options = options::Options {
+            blending_mode:     self.options.blending_mode,
+            color:             self.options.color,
+            lion_speed:        self.options.lion_speed,
+            mutation_decay:    self.options.mutation_decay,
+            mutation_rate:     self.options.mutation_rate,
+            simulation_length: self.options.simulation_length,
+            tree_height:       tree_height
         };
 
         World {
-            color:             self.color,
-            tower:             tower,
-            lion_speed:        self.lion_speed,
-            mutation_rate:     self.mutation_rate,
-            mutation_decay:    self.mutation_decay,
-            blending_mode:     self.blending_mode,
-            tree_height:       tree_height,
-            generation:        self.generation + 1,
-            simulation_length: self.simulation_length
+            generation: self.generation + 1,
+            options:    new_options,
+            tower:      tower
         }
     }
 }
@@ -108,9 +96,9 @@ pub fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
 
 fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
     vec![
-        (giraffe.color()  as i32, world.color       as i32, 1.0 as f32),
-        (giraffe.height() as i32, world.tree_height as i32, 1.5 as f32),
-        (giraffe.speed()  as i32, world.lion_speed  as i32, 1.0 as f32)
+        (giraffe.color()  as i32, world.options.color       as i32, 1.0 as f32),
+        (giraffe.height() as i32, world.options.tree_height as i32, 1.5 as f32),
+        (giraffe.speed()  as i32, world.options.lion_speed  as i32, 1.0 as f32)
     ]
         .into_iter()
         .map(|(phenotype, environment, weight)| {

@@ -6,11 +6,12 @@ extern crate gnuplot;
 extern crate rand;
 extern crate statistical;
 
-mod defaults;
 mod blending;
+mod defaults;
 mod mutation;
 mod giraffe;
 mod giraffe_lib;
+mod options;
 mod solution_space;
 mod statistics;
 mod traits;
@@ -36,12 +37,13 @@ struct Args {
 
 fn run_simulation() {
     let mut statistics = statistics::Statistics::new();
-    let mut world      = world::World::new(None);
+    let options        = options::Options::default();
+    let mut world      = world::World::new(options);
 
     statistics.update(&world);
     statistics.print_latest();
 
-    for _ in 0..world.simulation_length {
+    for _ in 0..world.options.simulation_length {
         world = world.evolve();
         statistics.update(&world);
         statistics.print_latest();

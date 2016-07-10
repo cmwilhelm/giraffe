@@ -7,6 +7,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use giraffe::Giraffe;
+use options;
 use world;
 
 
@@ -31,7 +32,7 @@ fn create_test_tower() -> Vec<Giraffe> {
 fn create_test_world() -> world::World {
     let tower = create_test_tower();
 
-    world::World::new_from_tower(tower, None)
+    world::World::new_from_tower(tower, options::Options::default())
 }
 
 fn create_fitness_matrix() -> Vec<Vec<f32>> {

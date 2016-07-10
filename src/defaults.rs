@@ -1,3 +1,5 @@
+use std::default;
+
 use blending::BlendingMode;
 use mutation::MutationDecay;
 
