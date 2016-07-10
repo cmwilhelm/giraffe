@@ -86,17 +86,15 @@ pub fn calculate_fitnesses(world: &World, tower: &Vec<Giraffe>) -> Vec<f32> {
 
 fn calculate_fitness(world: &World, giraffe: &Giraffe) -> f32 {
     vec![
-        (giraffe.color()  as i32, world.options.color       as i32, 1.0 as f32),
-        (giraffe.height() as i32, world.options.tree_height as i32, 1.5 as f32),
-        (giraffe.speed()  as i32, world.options.lion_speed  as i32, 1.0 as f32)
+        (giraffe.color()  as i32, world.options.color       as i32, 1.0),
+        (giraffe.height() as i32, world.options.tree_height as i32, 1.5),
+        (giraffe.speed()  as i32, world.options.lion_speed  as i32, 1.0)
     ]
         .into_iter()
         .map(|(phenotype, environment, weight)| {
             calculate_partial_fitness(phenotype, environment, weight)
         })
-        .fold(0.0, |acc, proportion| {
-            (acc + proportion) as f32
-        })
+        .fold(0.0, |acc, proportion| acc + proportion)
 }
 
 fn calculate_partial_fitness(phenotype: i32, environment: i32, weight: f32) -> f32 {
