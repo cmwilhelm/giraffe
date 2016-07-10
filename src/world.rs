@@ -70,19 +70,9 @@ impl World {
             self.options.tree_height
         };
 
-        let new_options = options::Options {
-            blending_mode:     self.options.blending_mode,
-            color:             self.options.color,
-            lion_speed:        self.options.lion_speed,
-            mutation_decay:    self.options.mutation_decay,
-            mutation_rate:     self.options.mutation_rate,
-            simulation_length: self.options.simulation_length,
-            tree_height:       tree_height
-        };
-
         World {
             generation: self.generation + 1,
-            options:    new_options,
+            options:    options::Options { tree_height: tree_height, ..self.options },
             tower:      tower
         }
     }
