@@ -7,7 +7,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use giraffe::Giraffe;
-use options;
+use options::Options;
 use world;
 
 
@@ -29,14 +29,14 @@ fn create_test_tower() -> Vec<Giraffe> {
     results
 }
 
-fn create_test_world() -> world::World {
+fn create_test_world(options: Options) -> world::World {
     let tower = create_test_tower();
 
-    world::World::new_from_tower(tower, options::Options::default())
+    world::World::new_from_tower(tower, options)
 }
 
-fn create_fitness_matrix() -> Vec<Vec<f32>> {
-    let world     = create_test_world();
+fn create_fitness_matrix(options: Options) -> Vec<Vec<f32>> {
+    let world     = create_test_world(options);
     let fitnesses = world::calculate_fitnesses(&world, &world.tower);
 
     let mut results = vec![];
@@ -104,8 +104,8 @@ fn create_mesh_triangles() -> Vec<nalgebra::Point3<u32>> {
     results
 }
 
-pub fn render_plot(destination: &str) {
-    let world     = create_test_world();
+pub fn render_plot(destination: &str, options: Options) {
+    let world     = create_test_world(options);
     let fitnesses = world::calculate_fitnesses(&world, &world.tower);
 
     let mut figure = gnuplot::Figure::new();
@@ -122,10 +122,10 @@ pub fn render_plot(destination: &str) {
     figure.show();
 }
 
-pub fn render_3d() {
+pub fn render_3d(options: Options) {
     let mut window = kiss3d::window::Window::new("Fitness Terrain");
 
-    let matrix    = create_fitness_matrix();
+    let matrix    = create_fitness_matrix(options);
     let vertices  = create_mesh_points(&matrix);
     let triangles = create_mesh_triangles();
 

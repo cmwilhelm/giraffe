@@ -1,10 +1,8 @@
 use std::cmp::Ordering;
 
-use blending::BlendingMode;
-use defaults;
 use giraffe::Giraffe;
 use giraffe_lib::random_proportion;
-use mutation::{MutationDecay, calculate_mutation_rate};
+use mutation::calculate_mutation_rate;
 use options;
 use traits::CanMate;
 use traits::HasColor;
@@ -20,7 +18,7 @@ pub struct World {
 
 impl World {
     pub fn new(options: options::Options) -> Self {
-        let tower: Vec<Giraffe> = (0..defaults::WORLD_SIZE).map(|_| {
+        let tower: Vec<Giraffe> = (0..options.herd_size).map(|_| {
             Giraffe::random()
         }).collect();
 
@@ -50,7 +48,7 @@ impl World {
 
         let cumulative_densities = generate_cumulative_densities(fitnesses);
 
-        let tower: Vec<Giraffe> = (0..defaults::WORLD_SIZE).map(|_| {
+        let tower: Vec<Giraffe> = (0..self.options.herd_size).map(|_| {
             let giraffe1 = select_giraffe(
                 &cumulative_densities,
                 &self.tower

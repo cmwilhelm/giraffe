@@ -1,7 +1,7 @@
 use giraffe_lib::random_proportion;
 use rand;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum MutationDecay {
     None,
     Linear,
