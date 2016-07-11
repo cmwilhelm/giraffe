@@ -34,6 +34,22 @@ impl World {
     }
 
     pub fn evolve(&self) -> Self {
+        let tower = self.next_tower();
+
+        let tree_height = if random_proportion() < 0.0001 {
+            (random_proportion() * 1500.0 + 500.0) as u32
+        } else {
+            self.options.tree_height
+        };
+
+        World {
+            generation: self.generation + 1,
+            options:    options::Options { tree_height: tree_height, ..self.options },
+            tower:      tower
+        }
+    }
+
+    fn next_tower(&self) -> Vec<Giraffe> {
         let mutation_rate = calculate_mutation_rate(
             self.options.mutation_decay,
             self.options.mutation_rate,
@@ -48,7 +64,7 @@ impl World {
 
         let cumulative_densities = generate_cumulative_densities(fitnesses);
 
-        let tower: Vec<Giraffe> = (0..self.options.herd_size).map(|_| {
+        (0..self.options.herd_size).map(|_| {
             let giraffe1 = select_giraffe(
                 &cumulative_densities,
                 &self.tower
@@ -60,19 +76,7 @@ impl World {
             );
 
             Giraffe::mate(giraffe1, giraffe2, mutation_rate, self.options.blending_mode)
-        }).collect();
-
-        let tree_height = if random_proportion() < 0.0001 {
-            (random_proportion() * 1500.0 + 500.0) as u32
-        } else {
-            self.options.tree_height
-        };
-
-        World {
-            generation: self.generation + 1,
-            options:    options::Options { tree_height: tree_height, ..self.options },
-            tower:      tower
-        }
+        }).collect::<Vec<Giraffe>>()
     }
 }
 
